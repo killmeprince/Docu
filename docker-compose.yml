@@ -1,0 +1,43 @@
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: docu
+      POSTGRES_USER: docu
+      POSTGRES_PASSWORD: docu
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/docu
+      SPRING_DATASOURCE_USERNAME: docu
+      SPRING_DATASOURCE_PASSWORD: docu
+      APP_JWT_SECRET: very-secret-key-for-docu-mvp-please-change-it-1234567890
+      APP_STORAGE_PATH: /app/storage
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+    volumes:
+      - file_storage:/app/storage
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    environment:
+      VITE_API_URL: http://localhost:8080/api
+    ports:
+      - "5173:5173"
+    depends_on:
+      - backend
+
+volumes:
+  postgres_data:
+  file_storage:
