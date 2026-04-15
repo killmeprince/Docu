@@ -1,0 +1,12 @@
+package io.github.killmeprince.docu.enums;
+
+public enum AuditEventType {
+    DOCUMENT_CREATED,
+    DOCUMENT_EDITED,
+    VERSION_CREATED,
+    DOCUMENT_SENT_FOR_APPROVAL,
+    APPROVAL_DECISION,
+    DOCUMENT_STATUS_CHANGED,
+    DOCUMENT_ARCHIVED,
+    DOCUMENT_VIEWED
+}
