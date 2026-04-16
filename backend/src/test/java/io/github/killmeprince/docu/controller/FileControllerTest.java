@@ -55,6 +55,6 @@ class FileControllerTest {
 
         mockMvc.perform(get("/api/files/{filename}", "stored.txt").principal(ControllerTestSupport.auth("employee")))
                 .andExpect(status().isOk())
-                .andExpect(header().string("Content-Disposition", "attachment; filename=doc.txt"));
+                .andExpect(header().string("Content-Disposition", "attachment; filename=\"doc.txt\""));
     }
 }
