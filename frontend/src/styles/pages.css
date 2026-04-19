@@ -1,0 +1,44 @@
+.login-page {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 32px;
+}
+
+.login-frame {
+  width: min(100%, 420px);
+  display: grid;
+  gap: 18px;
+}
+
+.login-brand {
+  text-align: center;
+  font-size: clamp(26px, 4vw, 34px);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.login-card {
+  backdrop-filter: blur(24px);
+}
+
+.login-bottom {
+  display: grid;
+  gap: 10px;
+}
+
+.details-grid,
+.editor-grid,
+.approvals-grid,
+.admin-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (max-width: 980px) {
+  .details-grid,
+  .editor-grid,
+  .approvals-grid,
+  .admin-grid {
+    grid-template-columns: 1fr;
+  }
+}

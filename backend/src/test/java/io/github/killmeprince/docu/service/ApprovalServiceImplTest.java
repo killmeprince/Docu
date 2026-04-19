@@ -81,6 +81,39 @@ class ApprovalServiceImplTest {
     }
 
     @Test
+    void decide_setsRejectedStatusWhenDecisionIsReject() {
+        when(accessService.getRequiredUser("approver")).thenReturn(approver);
+        when(stepRepository.findByIdAndApproverUsername(100L, "approver")).thenReturn(Optional.of(step));
+        when(accessService.canAccessDocument(approver, document)).thenReturn(true);
+        when(stepRepository.findByDocumentIdOrderByStepOrderAsc(10L)).thenReturn(List.of(step));
+
+        approvalService.decide(100L, new ApprovalDecisionRequest(ApprovalDecision.REJECT, "Rejected"), "approver");
+
+        assertEquals(ApprovalStepStatus.REJECTED, step.getStatus());
+        assertEquals(DocumentStatus.REJECTED, document.getStatus());
+        verify(auditService).log(10L, "approver", AuditEventType.APPROVAL_DECISION, "Decision: REJECT. Rejected");
+        verify(auditService).log(10L, "approver", AuditEventType.DOCUMENT_STATUS_CHANGED, "Status changed to REJECTED");
+    }
+
+    @Test
+    void decide_keepsDocumentInApprovalWhenNextPendingStepExists() {
+        User secondApprover = user(4L, "approver2", "Second Approver", "ROLE_APPROVER");
+        ApprovalStep nextStep = approvalStep(101L, document, secondApprover, 2, ApprovalStepStatus.PENDING);
+
+        when(accessService.getRequiredUser("approver")).thenReturn(approver);
+        when(stepRepository.findByIdAndApproverUsername(100L, "approver")).thenReturn(Optional.of(step));
+        when(accessService.canAccessDocument(approver, document)).thenReturn(true);
+        when(stepRepository.findByDocumentIdOrderByStepOrderAsc(10L)).thenReturn(List.of(step, nextStep));
+
+        approvalService.decide(100L, new ApprovalDecisionRequest(ApprovalDecision.APPROVE, "Step approved"), "approver");
+
+        assertEquals(ApprovalStepStatus.APPROVED, step.getStatus());
+        assertEquals(DocumentStatus.IN_APPROVAL, document.getStatus());
+        verify(auditService).log(10L, "approver", AuditEventType.APPROVAL_DECISION, "Decision: APPROVE. Step approved");
+        verify(auditService, never()).log(10L, "approver", AuditEventType.DOCUMENT_STATUS_CHANGED, "Status changed to APPROVED");
+    }
+
+    @Test
     void decide_rejectsNonCurrentStep() {
         ApprovalStep current = approvalStep(101L, document, approver, 1, ApprovalStepStatus.PENDING);
         when(accessService.getRequiredUser("approver")).thenReturn(approver);
@@ -104,6 +137,57 @@ class ApprovalServiceImplTest {
     }
 
     @Test
+    void decide_rejectsWhenDocumentStatusIsNotInApproval() {
+        document.setStatus(DocumentStatus.DRAFT);
+
+        when(accessService.getRequiredUser("approver")).thenReturn(approver);
+        when(stepRepository.findByIdAndApproverUsername(100L, "approver")).thenReturn(Optional.of(step));
+        when(accessService.canAccessDocument(approver, document)).thenReturn(true);
+
+        assertThrows(BusinessException.class,
+                () -> approvalService.decide(100L, new ApprovalDecisionRequest(ApprovalDecision.APPROVE, null), "approver"));
+
+        verify(stepRepository, never()).findByDocumentIdOrderByStepOrderAsc(10L);
+    }
+
+    @Test
+    void decide_rejectsWhenActorCannotAccessDocument() {
+        when(accessService.getRequiredUser("approver")).thenReturn(approver);
+        when(stepRepository.findByIdAndApproverUsername(100L, "approver")).thenReturn(Optional.of(step));
+        when(accessService.canAccessDocument(approver, document)).thenReturn(false);
+
+        assertThrows(BusinessException.class,
+                () -> approvalService.decide(100L, new ApprovalDecisionRequest(ApprovalDecision.APPROVE, null), "approver"));
+
+        verify(stepRepository, never()).findByDocumentIdOrderByStepOrderAsc(10L);
+    }
+
+    @Test
+    void decide_rejectsWhenNoPendingStepsRemain() {
+        ApprovalStep decided = approvalStep(101L, document, approver, 1, ApprovalStepStatus.APPROVED);
+
+        when(accessService.getRequiredUser("approver")).thenReturn(approver);
+        when(stepRepository.findByIdAndApproverUsername(100L, "approver")).thenReturn(Optional.of(step));
+        when(accessService.canAccessDocument(approver, document)).thenReturn(true);
+        when(stepRepository.findByDocumentIdOrderByStepOrderAsc(10L)).thenReturn(List.of(decided));
+
+        assertThrows(BusinessException.class,
+                () -> approvalService.decide(100L, new ApprovalDecisionRequest(ApprovalDecision.APPROVE, null), "approver"));
+    }
+
+    @Test
+    void decide_normalizesBlankCommentToNull() {
+        when(accessService.getRequiredUser("approver")).thenReturn(approver);
+        when(stepRepository.findByIdAndApproverUsername(100L, "approver")).thenReturn(Optional.of(step));
+        when(accessService.canAccessDocument(approver, document)).thenReturn(true);
+        when(stepRepository.findByDocumentIdOrderByStepOrderAsc(10L)).thenReturn(List.of(step));
+
+        approvalService.decide(100L, new ApprovalDecisionRequest(ApprovalDecision.APPROVE, "   "), "approver");
+
+        assertNull(step.getComment());
+    }
+
+    @Test
     void byDocument_returnsMappedResponsesForAccessibleDocument() {
         ApprovalStepResponse response = approvalStepResponse(100L);
         when(accessService.getRequiredUser("approver")).thenReturn(approver);
@@ -116,4 +200,19 @@ class ApprovalServiceImplTest {
 
         assertEquals(List.of(response), result);
     }
+
+    @Test
+    void byDocument_rejectsWhenAccessDenied() {
+        when(accessService.getRequiredUser("approver")).thenReturn(approver);
+        when(documentRepository.findById(10L)).thenReturn(Optional.of(document));
+        when(accessService.canAccessDocument(approver, document)).thenReturn(false);
+
+        assertThrows(BusinessException.class, () -> approvalService.byDocument(10L, "approver"));
+
+        verify(stepRepository, never()).findByDocumentIdOrderByStepOrderAsc(10L);
+        verify(mapper, never()).toResponse(any());
+    }
+
+
+
 }

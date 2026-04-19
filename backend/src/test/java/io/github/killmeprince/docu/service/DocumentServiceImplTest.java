@@ -6,6 +6,7 @@ import io.github.killmeprince.docu.dto.response.DocumentDetailsResponse;
 import io.github.killmeprince.docu.dto.response.DocumentResponse;
 import io.github.killmeprince.docu.dto.response.DocumentVersionResponse;
 import io.github.killmeprince.docu.entity.*;
+
 import io.github.killmeprince.docu.enums.ApprovalStepStatus;
 import io.github.killmeprince.docu.enums.AuditEventType;
 import io.github.killmeprince.docu.enums.DocumentStatus;
@@ -16,7 +17,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
+
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.mock.web.MockMultipartFile;
@@ -25,6 +26,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
+
+import java.io.IOException;
+
+import org.springframework.web.multipart.MultipartFile;
 
 import static io.github.killmeprince.docu.support.TestDataFactory.*;
 import static org.junit.jupiter.api.Assertions.*;
@@ -35,18 +40,29 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class DocumentServiceImplTest {
 
-    @Mock private DocumentRepository documentRepository;
-    @Mock private DocumentTypeRepository documentTypeRepository;
-    @Mock private DocumentVersionRepository versionRepository;
-    @Mock private FileAttachmentRepository attachmentRepository;
-    @Mock private ApprovalRouteTemplateRepository routeTemplateRepository;
-    @Mock private ApprovalStepTemplateRepository stepTemplateRepository;
-    @Mock private ApprovalStepRepository approvalStepRepository;
-    @Mock private AuditService auditService;
-    @Mock private DocumentMapper mapper;
-    @Mock private AccessService accessService;
+    @Mock
+    private DocumentRepository documentRepository;
+    @Mock
+    private DocumentTypeRepository documentTypeRepository;
+    @Mock
+    private DocumentVersionRepository versionRepository;
+    @Mock
+    private FileAttachmentRepository attachmentRepository;
+    @Mock
+    private ApprovalRouteTemplateRepository routeTemplateRepository;
+    @Mock
+    private ApprovalStepTemplateRepository stepTemplateRepository;
+    @Mock
+    private ApprovalStepRepository approvalStepRepository;
+    @Mock
+    private AuditService auditService;
+    @Mock
+    private DocumentMapper mapper;
+    @Mock
+    private AccessService accessService;
 
-    @TempDir Path tempDir;
+    @TempDir
+    Path tempDir;
 
     private DocumentServiceImpl documentService;
     private User author;
@@ -108,6 +124,29 @@ class DocumentServiceImplTest {
     }
 
     @Test
+    void create_rejectsDuplicateRegistrationNumber() {
+        when(accessService.getRequiredUser("employee")).thenReturn(author);
+        when(accessService.canCreateDocuments(author)).thenReturn(true);
+        when(documentTypeRepository.findById(1L)).thenReturn(Optional.of(type));
+        when(documentRepository.existsByRegistrationNumberIgnoreCase("REG-001")).thenReturn(true);
+
+        assertThrows(BusinessException.class,
+                () -> documentService.create(new DocumentCreateRequest(1L, " REG-001 ", "Title", null, null), null, "employee"));
+    }
+
+    @Test
+    void create_rejectsUserWithoutCreatePermission() {
+        when(accessService.getRequiredUser("employee")).thenReturn(author);
+        when(accessService.canCreateDocuments(author)).thenReturn(false);
+
+        assertThrows(BusinessException.class,
+                () -> documentService.create(new DocumentCreateRequest(1L, "REG-001", "Title", null, null), null, "employee"));
+
+        verifyNoInteractions(documentTypeRepository);
+        verify(documentRepository, never()).save(any(Document.class));
+    }
+
+    @Test
     void update_updatesEditableDraftAndCreatesNewVersion() {
         Document existing = document(10L, type, author, DocumentStatus.DRAFT);
         DocumentUpdateRequest request = new DocumentUpdateRequest(1L, "Updated title", " Updated description ", "Refined");
@@ -144,6 +183,36 @@ class DocumentServiceImplTest {
 
         assertThrows(BusinessException.class,
                 () -> documentService.update(10L, new DocumentUpdateRequest(1L, "Updated", null, null), null, "employee"));
+    }
+
+    @Test
+    void update_rejectsWhenActorIsNotAuthor() {
+        User otherEmployee = user(4L, "employee2", "Second Employee", "ROLE_EMPLOYEE");
+        Document existing = document(10L, type, author, DocumentStatus.DRAFT);
+
+        when(accessService.getRequiredUser("employee2")).thenReturn(otherEmployee);
+        when(documentRepository.findById(10L)).thenReturn(Optional.of(existing));
+        when(accessService.canAccessDocument(otherEmployee, existing)).thenReturn(true);
+
+        assertThrows(BusinessException.class,
+                () -> documentService.update(10L, new DocumentUpdateRequest(1L, "Updated", null, null), null, "employee2"));
+
+        verify(versionRepository, never()).save(any(DocumentVersion.class));
+        verify(auditService, never()).log(eq(10L), eq("employee2"), eq(AuditEventType.DOCUMENT_EDITED), anyString());
+    }
+
+    @Test
+    void update_rejectsWhenDocumentIsNotAccessible() {
+        Document existing = document(10L, type, author, DocumentStatus.DRAFT);
+
+        when(accessService.getRequiredUser("employee")).thenReturn(author);
+        when(documentRepository.findById(10L)).thenReturn(Optional.of(existing));
+        when(accessService.canAccessDocument(author, existing)).thenReturn(false);
+
+        assertThrows(BusinessException.class,
+                () -> documentService.update(10L, new DocumentUpdateRequest(1L, "Updated", null, null), null, "employee"));
+
+        verify(versionRepository, never()).save(any(DocumentVersion.class));
     }
 
     @Test
@@ -227,5 +296,77 @@ class DocumentServiceImplTest {
         when(routeTemplateRepository.findByDocumentTypeIdAndActiveTrue(1L)).thenReturn(Optional.empty());
 
         assertThrows(BusinessException.class, () -> documentService.sendToApproval(10L, "employee"));
+    }
+
+    @Test
+    void sendToApproval_rejectsWhenApprovalStepsNotConfigured() {
+        Document existing = document(10L, type, author, DocumentStatus.DRAFT);
+        ApprovalRouteTemplate route = routeTemplate(1L, type);
+
+        when(accessService.getRequiredUser("employee")).thenReturn(author);
+        when(documentRepository.findById(10L)).thenReturn(Optional.of(existing));
+        when(accessService.canAccessDocument(author, existing)).thenReturn(true);
+        when(routeTemplateRepository.findByDocumentTypeIdAndActiveTrue(1L)).thenReturn(Optional.of(route));
+        when(stepTemplateRepository.findByRouteTemplateIdOrderByStepOrderAsc(1L)).thenReturn(List.of());
+
+        assertThrows(BusinessException.class, () -> documentService.sendToApproval(10L, "employee"));
+
+        verify(approvalStepRepository, never()).save(any(ApprovalStep.class));
+    }
+
+    @Test
+    void sendToApproval_allowsReworkDocumentAndRecreatesSteps() {
+        Document existing = document(10L, type, author, DocumentStatus.REWORK);
+        ApprovalRouteTemplate route = routeTemplate(1L, type);
+        ApprovalStep oldStep = approvalStep(90L, existing, approver, 1, ApprovalStepStatus.REWORK);
+        ApprovalStepTemplate template1 = stepTemplate(1L, route, approver, 1);
+
+        when(accessService.getRequiredUser("employee")).thenReturn(author);
+        when(documentRepository.findById(10L)).thenReturn(Optional.of(existing));
+        when(accessService.canAccessDocument(author, existing)).thenReturn(true);
+        when(routeTemplateRepository.findByDocumentTypeIdAndActiveTrue(1L)).thenReturn(Optional.of(route));
+        when(stepTemplateRepository.findByRouteTemplateIdOrderByStepOrderAsc(1L)).thenReturn(List.of(template1));
+        when(approvalStepRepository.findByDocumentIdOrderByStepOrderAsc(10L)).thenReturn(List.of(oldStep));
+
+        documentService.sendToApproval(10L, "employee");
+
+        assertEquals(DocumentStatus.IN_APPROVAL, existing.getStatus());
+        verify(approvalStepRepository).deleteAll(List.of(oldStep));
+        verify(approvalStepRepository).save(any(ApprovalStep.class));
+        verify(auditService).log(10L, "employee", AuditEventType.DOCUMENT_SENT_FOR_APPROVAL, "Document sent to approval");
+        verify(auditService).log(10L, "employee", AuditEventType.DOCUMENT_STATUS_CHANGED, "Status changed to IN_APPROVAL");
+    }
+
+    @Test
+    void create_wrapsFileStorageIOExceptionAsBusinessException() throws Exception {
+        MultipartFile file = mock(MultipartFile.class);
+
+        when(accessService.getRequiredUser("employee")).thenReturn(author);
+        when(accessService.canCreateDocuments(author)).thenReturn(true);
+        when(documentTypeRepository.findById(1L)).thenReturn(Optional.of(type));
+        when(documentRepository.existsByRegistrationNumberIgnoreCase("REG-001")).thenReturn(false);
+        when(documentRepository.save(any(Document.class))).thenAnswer(invocation -> {
+            Document document = invocation.getArgument(0);
+            if (document.getId() == null) {
+                document.setId(10L);
+            }
+            return document;
+        });
+        when(versionRepository.findTopByDocumentIdOrderByVersionNumberDesc(10L))
+                .thenReturn(Optional.empty());
+        when(versionRepository.save(any(DocumentVersion.class))).thenAnswer(invocation -> {
+            DocumentVersion version = invocation.getArgument(0);
+            version.setId(100L);
+            return version;
+        });
+
+        when(file.isEmpty()).thenReturn(false);
+        when(file.getOriginalFilename()).thenReturn("doc.txt");
+        doThrow(new IOException("boom")).when(file).transferTo(any(Path.class));
+
+        assertThrows(BusinessException.class,
+                () -> documentService.create(new DocumentCreateRequest(1L, "REG-001", "Title", null, null), file, "employee"));
+
+        verify(attachmentRepository, never()).save(any(FileAttachment.class));
     }
 }

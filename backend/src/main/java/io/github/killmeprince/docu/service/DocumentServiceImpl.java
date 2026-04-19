@@ -165,7 +165,12 @@ public class DocumentServiceImpl implements DocumentService {
             throw new BusinessException("Approval steps are not configured");
         }
 
-        approvalStepRepository.deleteAll(approvalStepRepository.findByDocumentIdOrderByStepOrderAsc(id));
+        List<ApprovalStep> existingSteps = approvalStepRepository.findByDocumentIdOrderByStepOrderAsc(id);
+        if (!existingSteps.isEmpty()) {
+            approvalStepRepository.deleteAll(existingSteps);
+            approvalStepRepository.flush();
+        }
+
         for (var template : templates) {
             ApprovalStep step = ApprovalStep.builder()
                     .document(document)

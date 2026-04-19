@@ -1,5 +1,6 @@
 backend/HELP.md
 target/
+backend/target
 backend/.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
@@ -29,5 +30,15 @@ build/
 !**/src/main/**/build/
 !**/src/test/**/build/
 
+
 ### VS Code ###
 .vscode/
+.env
+frontend/README.md
+readme.md
+backend_smoke_notes.md
+frontend/.env
+backend/.env
+docu_test_patch.diff
+
+frontend/node_modules
