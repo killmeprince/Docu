@@ -1,0 +1,81 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font);
+  color: var(--text);
+  background:
+          radial-gradient(circle at 50% 12%, rgba(110, 147, 208, 0.14), transparent 24%),
+          linear-gradient(180deg, #031127 0%, #062048 42%, #081d3f 100%);
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: auto 0 -12vh 0;
+  height: 42vh;
+  background:
+          radial-gradient(circle at 20% 48%, rgba(255, 255, 255, 0.24), transparent 26%),
+          radial-gradient(circle at 48% 52%, rgba(255, 255, 255, 0.18), transparent 28%),
+          radial-gradient(circle at 72% 48%, rgba(255, 255, 255, 0.20), transparent 24%),
+          radial-gradient(circle at 88% 60%, rgba(255, 255, 255, 0.14), transparent 22%);
+  filter: blur(48px);
+  pointer-events: none;
+  opacity: 0.78;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+img {
+  display: block;
+  max-width: 100%;
+}
+
+.mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+.page-grid {
+  display: grid;
+  gap: 18px;
+}
+
+.ordered-list {
+  margin: 0;
+  padding-left: 18px;
+  color: var(--text-soft);
+  display: grid;
+  gap: 8px;
+}
+
+.compact-list {
+  gap: 6px;
+}
+
+.form-error {
+  margin-top: 12px;
+  color: var(--danger);
+  background: var(--danger-soft);
+  border: 1px solid rgba(223, 155, 160, 0.26);
+  border-radius: var(--radius-sm);
+  padding: 12px 14px;
+}
