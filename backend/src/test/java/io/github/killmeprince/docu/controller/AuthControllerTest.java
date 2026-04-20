@@ -9,7 +9,11 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static io.github.killmeprince.docu.support.TestDataFactory.*;
+import java.util.Set;
+import java.util.concurrent.TimeUnit;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -39,4 +43,6 @@ class AuthControllerTest {
                 .andExpect(jsonPath("$.token").value("jwt"))
                 .andExpect(jsonPath("$.username").value("employee"));
     }
+
+
 }

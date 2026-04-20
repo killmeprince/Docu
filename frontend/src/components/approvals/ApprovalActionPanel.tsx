@@ -29,7 +29,7 @@ export function ApprovalActionPanel({
             <Badge value={item.status} />
           </div>
           <div className="line-card-copy">
-            Комментарий: {item.comment || 'не указан'} · Решение: {formatDateTime(item.decidedAt)}
+            {item.comment || '—'} · {formatDateTime(item.decidedAt)}
           </div>
         </article>
       ))}
@@ -40,17 +40,17 @@ export function ApprovalActionPanel({
             label="Комментарий к решению"
             value={comment}
             onChange={(event) => setComment(event.target.value)}
-            placeholder="Почему согласовано, отклонено или возвращено на доработку"
+            placeholder="Комментарий"
           />
-          <div className="table-actions">
+          <div className="table-actions approval-actions-row">
             <Button variant="success" disabled={busy} onClick={() => void onDecide(current.id, 'APPROVE', comment)}>
-              Согласовать
+              ✓
             </Button>
             <Button variant="secondary" disabled={busy} onClick={() => void onDecide(current.id, 'REWORK', comment)}>
-              Вернуть на доработку
+              ↺
             </Button>
             <Button variant="danger" disabled={busy} onClick={() => void onDecide(current.id, 'REJECT', comment)}>
-              Отклонить
+              ✕
             </Button>
           </div>
         </div>

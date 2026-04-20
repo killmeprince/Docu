@@ -1,16 +1,16 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
-import { getDocuments } from '../api/documents';
-import { getReportSummary } from '../api/reports';
-import { WindowCard } from '../components/layout/WindowCard';
-import { StatCard } from '../components/ui/StatCard';
-import { EmptyState } from '../components/ui/EmptyState';
-import { useAuth } from '../contexts/AuthContext';
-import type { DocumentResponse, ReportResponse } from '../types/api';
-import { formatDateTime } from '../lib/format';
+import {useEffect, useState} from 'react';
+import {Link} from 'react-router-dom';
+import {getDocuments} from '../api/documents';
+import {getReportSummary} from '../api/reports';
+import {WindowCard} from '../components/layout/WindowCard';
+import {StatCard} from '../components/ui/StatCard';
+import {EmptyState} from '../components/ui/EmptyState';
+import {useAuth} from '../contexts/AuthContext';
+import type {DocumentResponse, ReportResponse} from '../types/api';
+import {formatDateTime} from '../lib/format';
 
 export function DashboardPage(): JSX.Element {
-    const { session } = useAuth();
+    const {session} = useAuth();
     const [documents, setDocuments] = useState<DocumentResponse[]>([]);
     const [report, setReport] = useState<ReportResponse | null>(null);
     const [reportLocked, setReportLocked] = useState(false);
@@ -34,15 +34,16 @@ export function DashboardPage(): JSX.Element {
     const inApproval = documents.filter((item) => item.status === 'IN_APPROVAL').length;
     const approved = documents.filter((item) => item.status === 'APPROVED').length;
     const recent = documents.slice(0, 5);
+    const canApprove = session?.roles.some((role) => role === 'ROLE_ADMIN' || role === 'ROLE_APPROVER') ?? false;
 
     return (
         <div className="page-grid">
             <WindowCard title="Обзор">
                 <div className="stats-grid">
-                    <StatCard title="Черновики" value={drafts} tone="accent" />
-                    <StatCard title="Согласование" value={inApproval} />
-                    <StatCard title="Согласовано" value={approved} tone="success" />
-                    <StatCard title="Всего" value={documents.length} />
+                    <StatCard title="Черновики" value={drafts} tone="accent"/>
+                    <StatCard title="Согласование" value={inApproval}/>
+                    <StatCard title="Согласовано" value={approved} tone="success"/>
+                    <StatCard title="Всего" value={documents.length}/>
                 </div>
             </WindowCard>
 
@@ -54,9 +55,11 @@ export function DashboardPage(): JSX.Element {
                     <Link className="quick-link" to="/документы">
                         Документы
                     </Link>
-                    <Link className="quick-link" to="/согласование">
-                        Согласование
-                    </Link>
+                    {canApprove ? (
+                        <Link className="quick-link" to="/согласование">
+                            Согласование
+                        </Link>
+                    ) : null}
                     {!reportLocked ? (
                         <Link className="quick-link" to="/отчётность">
                             Отчётность
@@ -67,7 +70,7 @@ export function DashboardPage(): JSX.Element {
 
             <WindowCard title="Последние документы">
                 {!recent.length ? (
-                    <EmptyState title="Пусто" description="Документы пока не созданы." />
+                    <EmptyState title="Пусто" description="Документы пока не созданы."/>
                 ) : (
                     <div className="list-stack">
                         {recent.map((item) => (
@@ -85,16 +88,16 @@ export function DashboardPage(): JSX.Element {
 
             <WindowCard title="Сводка">
                 {reportLocked ? (
-                    <EmptyState title="Недоступно" description="Для этой роли сводка закрыта." />
+                    <EmptyState title="Недоступно" description="Для этой роли сводка закрыта."/>
                 ) : report ? (
                     <div className="stats-grid narrow">
-                        <StatCard title="Доработка" value={report.reworkCount} />
-                        <StatCard title="Шаги" value={report.pendingStepCount} />
-                        <StatCard title="Отклонено" value={report.rejectedCount} tone="danger" />
-                        <StatCard title="Документы" value={report.totalDocuments} />
+                        <StatCard title="Доработка" value={report.reworkCount}/>
+                        <StatCard title="Шаги" value={report.pendingStepCount}/>
+                        <StatCard title="Отклонено" value={report.rejectedCount} tone="danger"/>
+                        <StatCard title="Документы" value={report.totalDocuments}/>
                     </div>
                 ) : (
-                    <EmptyState title="Загрузка" description="Сводка формируется." />
+                    <EmptyState title="Загрузка" description="Сводка формируется."/>
                 )}
             </WindowCard>
         </div>

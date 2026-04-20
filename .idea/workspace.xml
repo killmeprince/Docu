@@ -5,25 +5,14 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b559914f-60e0-4435-8843-9fc1929f5005" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/src/main/java/io/github/killmeprince/docu/config/DotEnvConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/compiler.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/compiler.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/modules.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/modules.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/Dockerfile" beforeDir="false" afterPath="$PROJECT_DIR$/backend/Dockerfile" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/main/resources/application.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/auth/DemoAccounts.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/auth/DemoAccounts.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/documents/DocumentFilters.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/documents/DocumentFilters.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/documents/DocumentTable.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/documents/DocumentTable.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/src/test/java/io/github/killmeprince/docu/controller/AuthControllerTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/src/test/java/io/github/killmeprince/docu/controller/AuthControllerTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/app/router.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/app/router.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/components/approvals/ApprovalActionPanel.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/approvals/ApprovalActionPanel.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/components/layout/Sidebar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/layout/Sidebar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/layout/Topbar.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/layout/Topbar.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/components/ui/Badge.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/components/ui/Badge.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/DocumentEditorPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/DocumentEditorPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/DocumentsPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/DocumentsPage.tsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/pages/LoginPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/LoginPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/ApprovalInboxPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/ApprovalInboxPage.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/frontend/src/pages/DashboardPage.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/pages/DashboardPage.tsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/styles/components.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/components.css" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/src/styles/layout.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/layout.css" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/frontend/src/styles/pages.css" beforeDir="false" afterPath="$PROJECT_DIR$/frontend/src/styles/pages.css" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -161,7 +150,8 @@
       <workItem from="1776633993496" duration="2587000" />
       <workItem from="1776636641967" duration="156000" />
       <workItem from="1776636825707" duration="2681000" />
-      <workItem from="1776640842454" duration="5773000" />
+      <workItem from="1776640842454" duration="6192000" />
+      <workItem from="1776647949363" duration="1773000" />
     </task>
     <servers />
   </component>

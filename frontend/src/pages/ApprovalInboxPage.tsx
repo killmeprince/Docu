@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { getDocuments, getDocument, getApprovalSteps } from '../api/documents';
 import { decideApprovalStep } from '../api/approvals';
-import { ApprovalQueue } from '../components/approvals/ApprovalQueue';
+
 import { ApprovalActionPanel } from '../components/approvals/ApprovalActionPanel';
 import { WindowCard } from '../components/layout/WindowCard';
 import { EmptyState } from '../components/ui/EmptyState';
@@ -55,29 +55,35 @@ export function ApprovalInboxPage(): JSX.Element {
 
   return (
     <div className="page-grid approvals-grid">
-      <WindowCard title="Входящие на согласование" subtitle="Рабочий inbox согласующего. Решение принимается без лишних переходов.">
+      <WindowCard title="Согласование" className="approval-inbox-card">
         {!items.length ? (
-          <EmptyState title="На согласовании ничего нет" description="Когда инициатор отправит документ, он появится в этом списке." />
+            <EmptyState title="Пусто" description="Документов на согласовании нет." />
         ) : (
           <div className="list-stack">
             {items.map((item) => (
-              <button key={item.id} type="button" className="line-card line-card-button" onClick={() => void openDocument(item.id)}>
-                <div className="line-card-head">
-                  <div>
-                    <div className="line-card-title">{item.title}</div>
-                    <div className="line-card-meta">{item.registrationNumber} · {item.author || item.authorUsername}</div>
+                <button
+                    key={item.id}
+                    type="button"
+                    className={`line-card line-card-button ${selected?.id === item.id ? 'line-card-selected' : ''}`.trim()}
+                    onClick={() => void openDocument(item.id)}
+                >
+                  <div className="line-card-head">
+                    <div>
+                      <div className="line-card-title">{item.title}</div>
+                      <div
+                          className="line-card-meta">{item.registrationNumber} · {item.author || item.authorUsername}</div>
+                    </div>
+                    <Badge value={item.status}/>
                   </div>
-                  <Badge value={item.status} />
-                </div>
-              </button>
+                </button>
             ))}
           </div>
         )}
       </WindowCard>
 
-      <WindowCard title="Область рассмотрения" subtitle="Карточка, статус и решение по текущему шагу — на одном экране.">
+      <WindowCard title="Рассмотрение" className="approval-review-card">
         {!selected ? (
-          <EmptyState title="Документ не выбран" description="Выбери объект из inbox, чтобы принять решение." />
+            <EmptyState title="Не выбрано" description="Выберите документ слева." />
         ) : (
           <>
             <div className="meta-grid slim">
@@ -90,15 +96,6 @@ export function ApprovalInboxPage(): JSX.Element {
             <ApprovalActionPanel steps={steps} onDecide={handleDecision} busy={busy} />
           </>
         )}
-      </WindowCard>
-
-      <WindowCard title="Почему этот экран сильный" subtitle="Где именно здесь можно выигрывать у тяжёлых ECM-интерфейсов.">
-        <ul className="ordered-list compact-list">
-          <li>Согласующий видит контекст и принимает решение в одном рабочем окне.</li>
-          <li>Возврат на доработку сопровождается осмысленным комментарием, а не хаотичной перепиской.</li>
-          <li>Статус документа и состояние конкретного шага не смешиваются.</li>
-          <li>Сценарий review-first быстрее и понятнее, чем прыжки по нескольким формам.</li>
-        </ul>
       </WindowCard>
     </div>
   );

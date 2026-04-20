@@ -8,6 +8,7 @@ function navClass({isActive}: { isActive: boolean }): string {
 export function Sidebar(): JSX.Element {
     const {session} = useAuth();
     const roles = session?.roles || [];
+    const canApprove = roles.some((role) => role === 'ROLE_ADMIN' || role === 'ROLE_APPROVER');
 
     return (
         <aside className="sidebar">
@@ -18,10 +19,12 @@ export function Sidebar(): JSX.Element {
                 <NavLink to="/документы" className={navClass}>
                     Документы
                 </NavLink>
-                <NavLink to="/согласование" className={navClass}>
-                    Согласование
-                </NavLink>
-                {roles.some((role) => role === 'ROLE_ADMIN' || role === 'ROLE_APPROVER') ? (
+                {canApprove ? (
+                    <NavLink to="/согласование" className={navClass}>
+                        Согласование
+                    </NavLink>
+                ) : null}
+                {canApprove ? (
                     <NavLink to="/отчётность" className={navClass}>
                         Отчётность
                     </NavLink>

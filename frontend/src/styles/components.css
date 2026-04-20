@@ -226,6 +226,11 @@
     cursor: pointer;
 }
 
+.line-card-selected {
+    border-color: rgba(146, 190, 255, 0.44);
+    background: rgba(130, 172, 245, 0.12);
+}
+
 .line-card-head {
     display: flex;
     align-items: start;
@@ -311,7 +316,32 @@
     color: var(--text-soft);
     line-height: 1.6;
 }
+.approval-inbox-card .window-card-body {
+    display: grid;
+    align-content: start;
+}
 
+.approval-review-card .window-card-body {
+    display: grid;
+    gap: 14px;
+}
+
+.approval-actions .field {
+    gap: 0;
+}
+
+.approval-actions .textarea {
+    min-height: 100px;
+}
+
+.approval-actions-row .btn {
+    min-height: 38px;
+    min-width: 42px;
+    padding: 0;
+    border-radius: 12px;
+    font-size: 18px;
+    font-weight: 600;
+}
 .toolbar-row {
     display: flex;
     align-items: center;
