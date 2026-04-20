@@ -110,7 +110,7 @@ export function DocumentEditorPage({mode}: { mode: 'create' | 'edit' }): JSX.Ele
                                 <div className="doc-preview-page"/>
                                 <div className="doc-preview-lines"/>
                             </div>
-                            <p className="doc-preview-copy">Загрузите файл, чтобы увидеть предварительный просмотр.</p>
+                            <p className="doc-preview-copy">Предварительный просмотр</p>
                         </div>
                     )}
                 </div>
@@ -214,9 +214,26 @@ export function DocumentEditorPage({mode}: { mode: 'create' | 'edit' }): JSX.Ele
 
                     <label className="field form-grid-span-2">
                         <span className="field-label">Файл версии</span>
-                        <input className="input" type="file"
-                               onChange={(event) => setFile(event.target.files?.[0] || null)}/>
-                        <span className="field-hint">Текущий файл: {file?.name || 'не выбран'}</span>
+
+                        <label className="file-picker">
+                            <input
+                                className="file-picker-input"
+                                type="file"
+                                onChange={(event) => setFile(event.target.files?.[0] || null)}
+                            />
+
+                            <span className="file-picker-button">
+                                {file ? 'Заменить файл' : 'Выбрать файл'}
+                            </span>
+
+                            <span className={`file-picker-name${file ? ' is-selected' : ''}`}>
+                                {file?.name || 'Файл не выбран'}
+                            </span>
+                        </label>
+
+                        <span className="field-hint">
+                        Поддерживается загрузка одной версии документа
+                        </span>
                     </label>
                 </div>
                 <div className="toolbar-row">

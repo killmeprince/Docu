@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import { DemoAccounts } from '../components/auth/DemoAccounts';
+import { QuickAccounts } from '../components/auth/QuickAccounts';
 import { LoginForm } from '../components/auth/LoginForm';
 import { WindowCard } from '../components/layout/WindowCard';
 import type { LoginRequest } from '../types/api';
@@ -10,7 +10,7 @@ export function LoginPage(): JSX.Element {
     const navigate = useNavigate();
     const { login } = useAuth();
     const [selected, setSelected] = useState<LoginRequest>({
-        username: 'employee',
+        username: 'автор_документов',
         password: 'password123',
     });
     const [loading, setLoading] = useState(false);
@@ -40,7 +40,7 @@ export function LoginPage(): JSX.Element {
                 </WindowCard>
 
                 <div className="login-bottom">
-                    <DemoAccounts onPick={setSelected} />
+                    <QuickAccounts onPick={setSelected} />
                 </div>
             </div>
         </div>

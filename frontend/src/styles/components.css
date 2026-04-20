@@ -316,6 +316,7 @@
     color: var(--text-soft);
     line-height: 1.6;
 }
+
 .approval-inbox-card .window-card-body {
     display: grid;
     align-content: start;
@@ -342,6 +343,7 @@
     font-size: 18px;
     font-weight: 600;
 }
+
 .toolbar-row {
     display: flex;
     align-items: center;
@@ -394,6 +396,82 @@
 
 .stats-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.interactive-stats-grid {
+    perspective: 1200px;
+}
+
+.interactive-stat-card {
+    --interactive-rotate-x: 0deg;
+    --interactive-rotate-y: 0deg;
+    --interactive-shift-x: 0px;
+    --interactive-shift-y: 0px;
+    transform-style: preserve-3d;
+}
+
+.interactive-stat-card .stat-card {
+    position: relative;
+    overflow: hidden;
+    transform:
+            translate3d(var(--interactive-shift-x), var(--interactive-shift-y), 0)
+            rotateX(var(--interactive-rotate-x))
+            rotateY(var(--interactive-rotate-y));
+    transform-origin: center center;
+    transition: transform 120ms linear, box-shadow 180ms ease, border-color 180ms ease;
+    will-change: transform;
+    box-shadow: 0 12px 22px rgba(0, 0, 0, 0.2);
+}
+
+.interactive-stat-card:hover .stat-card {
+    box-shadow: 0 16px 30px rgba(0, 0, 0, 0.28);
+}
+
+.interactive-stat-card .stat-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.28;
+}
+
+.overview-card-draft .stat-card::after {
+    background: linear-gradient(135deg, rgba(203, 173, 122, 0.32), rgba(203, 173, 122, 0));
+}
+
+.overview-card-approval .stat-card::after {
+    background: linear-gradient(135deg, rgba(155, 186, 245, 0.28), rgba(155, 186, 245, 0));
+}
+
+.overview-card-approved .stat-card::after {
+    background: linear-gradient(135deg, rgba(138, 211, 178, 0.30), rgba(138, 211, 178, 0));
+}
+
+.overview-card-total .stat-card::after {
+    background: linear-gradient(135deg, rgba(188, 196, 216, 0.24), rgba(188, 196, 216, 0));
+}
+
+.report-card-rework .stat-card::after {
+    background: linear-gradient(135deg, rgba(203, 173, 122, 0.32), rgba(203, 173, 122, 0));
+}
+
+.report-card-pending .stat-card::after {
+    background: linear-gradient(135deg, rgba(155, 186, 245, 0.28), rgba(155, 186, 245, 0));
+}
+
+.report-card-rejected .stat-card::after {
+    background: linear-gradient(135deg, rgba(223, 155, 160, 0.30), rgba(223, 155, 160, 0));
+}
+
+.report-card-total .stat-card::after {
+    background: linear-gradient(135deg, rgba(188, 196, 216, 0.24), rgba(188, 196, 216, 0));
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .interactive-stat-card .stat-card {
+        transform: none;
+        transition: none;
+    }
 }
 
 .form-grid.three-columns {
@@ -935,7 +1013,7 @@
     background: rgba(41, 30, 14, 0.88);
 }
 
-.demo-accounts {
+.quick-accounts {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -943,7 +1021,7 @@
     flex-wrap: wrap;
 }
 
-.demo-account-card {
+.quick-account-card {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -953,7 +1031,7 @@
     padding: 8px 10px 8px 14px;
 }
 
-.demo-account-title {
+.quick-account-title {
     font-size: 13px;
     color: var(--text-soft);
 }
