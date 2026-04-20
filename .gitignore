@@ -42,3 +42,5 @@ backend/.env
 docu_test_patch.diff
 
 frontend/node_modules
+
+/.env

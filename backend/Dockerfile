@@ -3,14 +3,9 @@ FROM maven:3.9.9-eclipse-temurin-17 AS build
 WORKDIR /app
 
 COPY pom.xml ./
-COPY .mvn .mvn
-COPY mvnw ./
+COPY src/ src/
 
-RUN chmod +x mvnw
-
-COPY src src
-
-RUN ./mvnw -q --no-transfer-progress -DskipTests package
+RUN mvn -q --no-transfer-progress -DskipTests package
 
 FROM eclipse-temurin:17-jre
 

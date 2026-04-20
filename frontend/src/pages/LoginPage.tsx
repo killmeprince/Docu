@@ -7,42 +7,42 @@ import type { LoginRequest } from '../types/api';
 import { useAuth } from '../contexts/AuthContext';
 
 export function LoginPage(): JSX.Element {
-  const navigate = useNavigate();
-  const { login } = useAuth();
-  const [selected, setSelected] = useState<LoginRequest>({
-    username: 'employee',
-    password: 'password123',
-  });
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+    const navigate = useNavigate();
+    const { login } = useAuth();
+    const [selected, setSelected] = useState<LoginRequest>({
+        username: 'employee',
+        password: 'password123',
+    });
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-  async function submit(payload: LoginRequest): Promise<void> {
-    setLoading(true);
-    setError(null);
-    try {
-      await login(payload);
-      navigate('/рабочий-стол');
-    } catch (loginError) {
-      setError(loginError instanceof Error ? loginError.message : 'Не удалось выполнить вход');
-    } finally {
-      setLoading(false);
+    async function submit(payload: LoginRequest): Promise<void> {
+        setLoading(true);
+        setError(null);
+        try {
+            await login(payload);
+            navigate('/рабочий-стол');
+        } catch (loginError) {
+            setError(loginError instanceof Error ? loginError.message : 'Не удалось выполнить вход');
+        } finally {
+            setLoading(false);
+        }
     }
-  }
 
-  return (
-      <div className="login-page">
-        <div className="login-frame">
-          <div className="login-brand">docu</div>
+    return (
+        <div className="login-page">
+            <div className="login-frame">
+                <div className="login-brand">docu</div>
 
-          <WindowCard className="login-card">
-            <LoginForm onSubmit={submit} loading={loading} initial={selected} />
-            {error ? <div className="form-error">{error}</div> : null}
-          </WindowCard>
+                <WindowCard className="login-card">
+                    <LoginForm onSubmit={submit} loading={loading} initial={selected} />
+                    {error ? <div className="form-error">{error}</div> : null}
+                </WindowCard>
 
-          <div className="login-bottom">
-            <DemoAccounts onPick={setSelected} />
-          </div>
+                <div className="login-bottom">
+                    <DemoAccounts onPick={setSelected} />
+                </div>
+            </div>
         </div>
-      </div>
-  );
+    );
 }

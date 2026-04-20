@@ -11,7 +11,7 @@ const ACCOUNTS: Array<{ title: string; payload: LoginRequest }> = [
     payload: { username: 'approver', password: 'password123' },
   },
   {
-    title: 'Администратор',
+    title: 'Админ',
     payload: { username: 'admin', password: 'password123' },
   },
 ];
